@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.UI;
+using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using WebGrease.Css.Ast.Selectors;
 
 namespace WebApplicationAhorcado
 {
@@ -40,7 +39,11 @@ namespace WebApplicationAhorcado
 
             vidas = (int) ViewState["vidas"];
 
-            listButtons = AddButtons();
+            CreateLabelsLetter();
+            
+            //listButtons = AddButtons();
+            listButtons = new List<Button>();
+            CreateButtons();
             
             DataBind();
         }
@@ -55,7 +58,7 @@ namespace WebApplicationAhorcado
             return palabras[index];
         }
 
-        private List<Button> AddButtons()
+        /*private List<Button> AddButtons()
         {
             List<Button> buttons = new List<Button>();
             
@@ -87,6 +90,42 @@ namespace WebApplicationAhorcado
             buttons.Add(ButtonZ);
 
             return buttons;
+        }*/
+
+        private void CreateLabelsLetter()
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                Label label = new Label();
+                label.ID = "LabelLetter" + (i + 1);
+                label.Text = chars[i].ToString();
+                
+                Letters.Controls.Add(label);
+            }
+        }
+
+        private void CreateButtons()
+        {
+            string lettersTop = "ABCDEFGHIJKLM";
+            AddButtonsTo(ButtonsTop, lettersTop);
+
+            string lettersBottom = "NOPQRSTUVWXYZ";
+            AddButtonsTo(ButtonsBottom, lettersBottom);
+        }
+
+        private void AddButtonsTo(HtmlGenericControl control, string letters)
+        {
+            for (int i = 0; i < letters.Length; i++)
+            {
+                Button btn = new Button();
+                btn.ID = "Button" + letters[i];
+                btn.Text = letters[i].ToString();
+                btn.CssClass = "btn btn-secondary";
+                btn.Click += new EventHandler(ButtonLetter_Click);
+                
+                control.Controls.Add(btn);
+                listButtons.Add(btn);
+            }
         }
 
         protected void ButtonLetter_Click(object sender, EventArgs e)
@@ -100,7 +139,13 @@ namespace WebApplicationAhorcado
                     for (int i = 0; i < palabra.Length; i++)
                     {
                         if (palabra[i] == letra)
+                        {
                             chars[i] = letra;
+
+                            // Obtenemos una lista solo con los labels y buscamos por el índice
+                            Label label = (Label) Letters.Controls.OfType<Label>().ToList()[i];
+                            label.Text = chars[i].ToString();
+                        }
                     }
 
                     // Desactivamos el botón y lo ponemos de color verde
